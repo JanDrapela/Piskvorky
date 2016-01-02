@@ -1,5 +1,9 @@
 package piskvorky;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -7,21 +11,23 @@ import java.util.*;
  * @author Jan Drapela
  */
 public class Piskvorky {
+
     static int N = 15; //zatim jsem nastavil velikost desky na 15x15
     static String[][] Pole = new String[N][N];
-    
-    public static void main(String[] args)
-    {
+
+    public static void main(String[] args) throws IOException {
+
+        String Path = "C:\\TEMP\\";
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
                 Pole[i][j] = "";
             }
         }
-        nacteHru("Hra1.txt");
+        nacteHru(Path + "hra1.txt");
         int Hrac = 1;
         while (true) {
-            System.out.print("\033[H\033[2J"); // melo by fungovat jako clear screen 
-            System.out.flush();
+            //System.out.print("\033[H\033[2J"); // melo by fungovat jako clear screen 
+            //System.out.flush();
             hraciDeska();
             Prompt(Hrac);
             if (Hrac == 1) {
@@ -29,41 +35,45 @@ public class Piskvorky {
             } else {
                 Hrac = 1;
             }
+            break;      //neustale opakovani-nahravani pole
         }
     }
-    //public static boolean SaveGame(string aFileName)
-    //{
+        //public static boolean SaveGame(string aFileName)
+        //{
 
-    //}
-   public static void nacteHru(String aFileName) {
-        Scanner sr = new Scanner(aFileName);
+        //}
+    public static void nacteHru(String aFileName) throws FileNotFoundException, IOException {
+        BufferedReader br = new BufferedReader(new FileReader(aFileName));
         String line = "";
         int i = 0;
         while (line != null) {
-            line = sr.nextLine();
+            line = br.readLine();
             if (line == null) {
                 continue;
             }
             if (line == "") {
                 continue;
             }
-            String[] pom = line.split(" "); // pomocne pole stringu, {"1","0",...}
+            // VYHAZUJE CHYBU OUTOFINDEX
+            /*String[] pom = line.split(" "); // pomocne pole stringu, {"1","0",...}
             for (int j = 0; j < N; j++) {
                 Pole[i][j] = pom[j];
             }
             i++;
+             */
         }
-        sr.close();
+        br.close();
 
     }
+
     public static void hraciDeska() {
-        /*  const   */ String H = "                   ";
+        String H = "                   ";
         System.out.println();
         System.out.println();
-        System.out.println(H + "    A B C D E F G H I J K L M N O");
+        System.out.print(H + "   A B C D E F G H I J K L M N O");
         System.out.print(H + "   ");
         for (int j = 0; j < N; j++) {
-            System.out.print(" _");
+            //System.out.print(" _");
         }
         System.out.println();
         for (int i = 0; i < N; i++) {
@@ -71,18 +81,21 @@ public class Piskvorky {
             if (i < 10) {
                 S = " " + S;
             }
-            System.out.print(H + S + " |");
+            System.out.print(H + S + "|" + "_");
             for (int j = 0; j < N; j++) {
                 S = "_";
-                if (Pole[i][j] != "-") 
+                if (Pole[i][j] != "-") {
                     S = Pole[i][j];
-                
-                System.out.print(S + "|");
+                }
+                if (j < N) {
+                    System.out.print(S + "|" + "_");
+                }
             }
             System.out.println();
         }
 
-    } 
+    }
+
     static void Prompt(int Hrac) {
         if (Hrac == 1) {
             System.out.println(">");
