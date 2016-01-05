@@ -10,6 +10,10 @@ public class Piskvorky {
 
     static int N = 15; //zatim jsem nastavil velikost desky na 15x15
     static String[][] Pole = new String[N][N];
+    static String Hrac1 = "Milan";
+    static String Hrac2 = "Honza";
+    static Scanner sc = new Scanner(System.in);
+    static boolean QuitGame = false;
 
     public static void main(String[] args) throws IOException {
 
@@ -21,9 +25,9 @@ public class Piskvorky {
         }
         nacteHru(Path + "hra1.txt");
         int Hrac = 1;
-        while (true) {
-            //System.out.print("\033[H\033[2J"); // melo by fungovat jako clear screen 
-            //System.out.flush();
+        while (QuitGame == false) {
+            System.out.print("\033[H\033[2J"); // melo by fungovat jako clear screen 
+            System.out.flush();
             hraciDeska();
             Prompt(Hrac);
             if (Hrac == 1) {
@@ -31,13 +35,13 @@ public class Piskvorky {
             } else {
                 Hrac = 1;
             }
-            break;      //neustale opakovani-nahravani pole
+            //break;     // neni potreba, nutnost pole znovu nacist po kazdem tahu
         }
     }
-        //public static boolean SaveGame(string aFileName)
-        //{
+    //public static boolean SaveGame(string aFileName)
+    //{
 
-        //}
+    //}
     public static void nacteHru(String aFileName) throws FileNotFoundException, IOException {
         BufferedReader br = new BufferedReader(new FileReader(aFileName));
         String line = "";
@@ -47,16 +51,13 @@ public class Piskvorky {
             if (line == null) {
                 continue;
             }
-            if (line == "") {
-                continue;
+            if (line != "") {
+                String[] pom = line.split(" "); // pomocne pole stringu, {"1","0",...}
+                for (int j = 0; j < N; j++) {
+                    Pole[i][j] = pom[j];
+                }
+                i++;
             }
-            // VYHAZUJE CHYBU OUTOFINDEX
-            /*String[] pom = line.split(" "); // pomocne pole stringu, {"1","0",...}
-            for (int j = 0; j < N; j++) {
-                Pole[i][j] = pom[j];
-            }
-            i++;
-             */
         }
         br.close();
 
@@ -68,23 +69,21 @@ public class Piskvorky {
         System.out.println();
         System.out.print(H + "   A B C D E F G H I J K L M N O");
         System.out.print(H + "   ");
-        for (int j = 0; j < N; j++) {
-            //System.out.print(" _");
-        }
         System.out.println();
         for (int i = 0; i < N; i++) {
-            String S = Integer.toString(i);
-            if (i < 10) {
+            String S = Integer.toString(i + 1);
+            if (i < 9) {
                 S = " " + S;
             }
-            System.out.print(H + S + "|" + "_");
+            System.out.print(H + S + "|");
             for (int j = 0; j < N; j++) {
-                S = "_";
-                if (Pole[i][j] != "-") {
+                if (Pole[i][j].equals("-")) {
+                    S = "_";
+                } else {
                     S = Pole[i][j];
                 }
                 if (j < N) {
-                    System.out.print(S + "|" + "_");
+                    System.out.print(S + "|");
                 }
             }
             System.out.println();
@@ -94,9 +93,45 @@ public class Piskvorky {
 
     static void Prompt(int Hrac) {
         if (Hrac == 1) {
-            System.out.println(">");
+            System.out.print(Hrac1 + "> ");
         } else {
-            System.out.println("                                           >");
+            System.out.print("                                          " + Hrac2 + " > ");
+        }
+        String Input = sc.nextLine();
+        Input = Input.trim().toLowerCase();
+        String ColStr = Input.substring(0, 1);
+        switch (ColStr) {
+            case "q":
+                QuitGame = true;
+                break;
+            case "a":
+            case "b":
+            case "c":
+            case "d":
+            case "e":
+            case "f":
+            case "g":
+            case "h":
+            case "i":
+            case "j":
+            case "k":
+            case "l":
+            case "m":
+            case "n":
+            case "o": {
+                String RowStr = "";
+                if (Input.length() == 3) {
+                    RowStr = Input.substring(1, 3);
+                } else if (Input.length() == 2) {
+                    RowStr = Input.substring(1, 2);
+                } else ; // todo osetrit chybu vstupu
+                int Col = ColStr.charAt(0) - 'a';  // pismenko sloupce, a..o, nebo q pro quit game
+                int Row = Integer.parseInt(RowStr);// cislo 1-15
+                Row--;
+                Pole[Row][Col] = (Hrac == 1 ? "x" : "o");  // ternarni operator - podle cisla akt. hrace voli jeho symbol
+
+            }
+            break;
         }
     }
 }
